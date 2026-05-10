@@ -1,3 +1,8 @@
+## [1.0.1] - 2026-05-11
+
+### Changed
+- Added repository link to pubspec.yaml
+
 ## [1.0.0] - 2026-05-11
 
 ### 🎉 Initial Release
