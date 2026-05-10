@@ -1,6 +1,6 @@
 name: omni_logger
-description: "Omni Logger: Production-Ready Logging for Flutter"
-version: 1.0.4
+description: "Omni Logger is a production-ready logging package for Flutter with auto-configuration, file rotation, isolate support, and build mode optimization."
+version: 1.0.5
 homepage: 'https://github.com/Observability-Labs/omni_logger'
 repository: https://github.com/Observability-Labs/omni_logger
 

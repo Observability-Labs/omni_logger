@@ -1,3 +1,8 @@
+## [1.0.5] - 2026-05-11
+
+### Fixed
+- Expanded `description` in `pubspec.yaml` to meet pub.dev requirements (50-180 characters)
+
 ## [1.0.4] - 2026-05-11
 
 ### Fixed
