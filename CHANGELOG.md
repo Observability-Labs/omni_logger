@@ -1,3 +1,8 @@
+## [1.0.2] - 2026-05-11
+
+### Fixed
+- Downgraded `device_info_plus` to `^10.1.0` to resolve `win32` version conflict with `flutter_secure_storage_windows`
+
 ## [1.0.1] - 2026-05-11
 
 ### Changed
