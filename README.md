@@ -107,20 +107,22 @@ AppLog.log('SyncService').w('Sync took longer than expected');
 ### Setup Options
 
 ```dart
-AppLog.setup();             // Auto-detect environment
-AppLog.setupDevelopment();  // Debug mode with clean logs
-AppLog.setupProduction();   // Minimal logging
-AppLog.setupOff();          // Disable all logging
-AppLog.setupVerbose();      // Maximum logging
+AppLog.setup();            // Auto-detect environment
+AppLog.setupDevelopment(); // Debug mode with clean logs
+AppLog.setupProduction();  // Minimal logging
+AppLog.setupOff();         // Disable all logging
 ```
 
 ### Runtime Control
 
 ```dart
-AppLog.cleanAllLogs();   // Clean all log files
-AppLog.printLogStats();  // Print log statistics
-AppLog.checkHealth();    // Get health status
-AppLog.reset();          // Reset logger
+AppLog.cleanAllLogs();     // Clean all log files
+AppLog.printLogStats();    // Print log statistics
+AppLog.checkHealth();      // Get health status
+AppLog.reset();            // Reset logger
+AppLog.isSetup;            // Check if initialized
+AppLog.currentLevel;       // Get current log level
+AppLog.isLoggingDisabled;  // Check if logging is off
 ```
 
 ---
@@ -131,7 +133,9 @@ AppLog.reset();          // Reset logger
 |----------|---------|--------------|
 | Android  | ✅      | ✅           |
 | iOS      | ✅      | ✅           |
-| Desktop  | ✅      | ✅           |
+| macOS    | ✅      | ✅           |
+| Windows  | ✅      | ✅           |
+| Linux    | ✅      | ✅           |
 | Web      | ✅      | ❌ (by design) |
 
 ---
@@ -145,4 +149,7 @@ Contributions are welcome! Please submit pull requests to our [repository](https
 MIT License — see [LICENSE](LICENSE) for details.
 
 ---
+
+**Platform Support**: ✅ Android, iOS, macOS, Windows, Linux | 🌐 Web (console only)
+
 Built with ❤️ for the Flutter community

@@ -1,29 +1,3 @@
-// USAGE EXAMPLE
-//
-// IMPORTANT RECOMMENDATION:
-// If you're using basic logging only, rename `AppLogBasic` to `AppLog`.
-// This makes it easier to upgrade to the full-featured `AppLog` class later
-// without having to refactor your codebase.
-
-// ===============USAGE FOR BASIC==============================
-// Future<void> main(List<String> args) async {
-//   runZonedGuarded<Future<void>>(() async {
-//     WidgetsFlutterBinding.ensureInitialized();
-//
-//     AppLogBasic.setup();
-//     AppLogBasic.printLogFileStats();
-//     AppLogBasic.printStatsSummary();
-//   }, (error, stack) {
-//     // Handle uncaught errors here
-//     if (kDebugMode) {
-//       print('Uncaught error: $error');
-//     }
-//     if (kDebugMode) {
-//       print('Stack trace: $stack');
-//     }
-//   });
-// }
-
 import 'package:omni_logger/omni_logger.dart';
 
 class AppLog {
