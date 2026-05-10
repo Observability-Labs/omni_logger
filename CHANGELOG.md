@@ -1,3 +1,8 @@
+## [1.0.3] - 2026-05-11
+
+### Fixed
+- Widened `device_info_plus` version range to `>=10.1.0 <14.0.0` to resolve compatibility conflicts with `amplify_analytics_pinpoint` and `flutter_secure_storage_windows`
+
 ## [1.0.2] - 2026-05-11
 
 ### Fixed

@@ -1,6 +1,6 @@
 name: omni_logger
 description: "Omni Logger: Production-Ready Logging for Flutter"
-version: 1.0.2
+version: 1.0.3
 homepage: 'https://github.com/Observability-Labs/omni_logger'
 repository: https://github.com/Observability-Labs/omni_logger
 
