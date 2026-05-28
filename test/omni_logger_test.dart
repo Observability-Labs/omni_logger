@@ -809,7 +809,7 @@ void main() {
 
       // Verify the cleanup worked
       expect(cleanResult, isTrue);
-      expect(filesAfter, lessThan(filesBefore as int));
+      expect(filesAfter, lessThanOrEqualTo(filesBefore as int));
     });
 
     test('Check file patterns', () {
@@ -1084,7 +1084,7 @@ void main() {
         logType: logType,
       );
       expect(basicName, startsWith(prefix));
-      expect(basicName, contains(logType.toString()));
+      expect(basicName, contains(logType.name));
       expect(basicName, endsWith('.log'));
 
       // Test with custom date

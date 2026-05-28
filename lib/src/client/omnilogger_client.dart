@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:omni_logger/omni_logger.dart';
+import 'package:omni_logger/src/loggerManager/support/my_log_directory.dart';
 
 // coverage:ignore-start
 // Enhanced AppLog with isolate awareness and beautiful log stats display
@@ -30,8 +31,9 @@ class OmniLoggerClient {
   static OmniLogger getLogger(String className) => log(className);
 
   /// Setup method (optional) - for explicit initialization if needed
-  static bool setup({OmniLogger? omniLogger}) {
+  static Future<bool> setup({OmniLogger? omniLogger}) async {
     try {
+      await MyLogDirectoryManage.init();
       _instance = omniLogger ?? OmniLogger(OmniLogConfig.auto());
       return true;
     } catch (e) {
@@ -41,6 +43,243 @@ class OmniLoggerClient {
     }
   }
 
+  /// DEVELOPMENT SETUP
+  static Future<bool> setupDevelopment({
+    bool cleanLogsFirst = true,
+    String? isolatePrefix,
+  }) async {
+    try {
+      await MyLogDirectoryManage.init();
+      if (cleanLogsFirst) {
+        if (isSetup) {
+          cleanAllLogs();
+        }
+        reset();
+      }
+
+      _instance = OmniLogger(OmniLogConfig.debug(isolatePrefix: isolatePrefix));
+
+      final classLogger = OmniLoggerClient.log('AppLog');
+      classLogger.i('🚀 Development logger setup complete');
+      if (cleanLogsFirst) {
+        classLogger.i('🧹 Started with clean log files');
+      }
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// CONDITIONAL CLEAN SETUP
+  static Future<bool> setupWithConditionalClean({
+    bool cleanInDebugMode = true,
+    OmniLogger? myLogger,
+  }) async {
+    try {
+      await MyLogDirectoryManage.init();
+      // Clean logs only in debug mode
+      if (kDebugMode && cleanInDebugMode && isSetup) {
+        cleanAllLogs();
+        reset();
+      }
+
+      // Setup the logger
+      _instance = myLogger ?? OmniLogger(OmniLogConfig.auto());
+
+      final classLogger = OmniLoggerClient.log('AppLog');
+      if (kDebugMode && cleanInDebugMode) {
+        classLogger.i('🧹 Debug mode: Started with clean logs');
+      }
+      classLogger.i('📊 Logger initialized successfully');
+
+      return true;
+    } catch (e) {
+      // Fallback to auto logger
+      _instance = OmniLogger(OmniLogConfig.auto());
+      return false;
+    }
+  }
+
+  /// Quick setup to disable all logging in the **main isolate only**.
+  static Future<bool> setupOff({String? isolatePrefix}) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(OmniLogConfig.off(isolatePrefix: isolatePrefix));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Quick setup for minimal logging (errors + crashes only)
+  static Future<bool> setupMinimal({String? isolatePrefix}) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(
+        OmniLogConfig.production(isolatePrefix: isolatePrefix),
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Quick setup for verbose logging (debug mode override)
+  static Future<bool> setupVerbose({String? isolatePrefix}) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(OmniLogConfig.debug(isolatePrefix: isolatePrefix));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup with custom log level - for fine control
+  static Future<bool> setupCustomLevel({
+    required OmniLogLevel level,
+    String? isolatePrefix,
+    bool? enableFileLogging,
+    bool? enableConsoleLogging,
+  }) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(
+        OmniLogConfig.custom(
+          mode: OmniLogConfigManager.getCurrentMode(),
+          isolatePrefix: isolatePrefix,
+          levelOverride: level,
+          fileLoggingOverride: enableFileLogging,
+          consoleLoggingOverride: enableConsoleLogging,
+        ),
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup for database isolate
+  static Future<bool> setupForDatabaseIsolate({
+    String isolateName = 'db_isolate',
+    OmniLogLevel? logLevel,
+  }) async {
+    try {
+      await MyLogDirectoryManage.init();
+      final config = logLevel != null
+          ? OmniLogConfig.forDatabase(
+              isolatePrefix: isolateName,
+            ).copyWith(level: logLevel)
+          : OmniLogConfig.forDatabase(isolatePrefix: isolateName);
+      _instance = OmniLogger(config);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup for background isolate
+  static Future<bool> setupForBackgroundIsolate({
+    String isolateName = 'bg_isolate',
+    OmniLogLevel? logLevel,
+  }) async {
+    try {
+      await MyLogDirectoryManage.init();
+      final config = logLevel != null
+          ? OmniLogConfig.forBackground(
+              isolatePrefix: isolateName,
+            ).copyWith(level: logLevel)
+          : OmniLogConfig.forBackground(isolatePrefix: isolateName);
+      _instance = OmniLogger(config);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup for network isolate
+  static Future<bool> setupForNetworkIsolate({
+    String isolateName = 'network_isolate',
+    OmniLogLevel? logLevel,
+  }) async {
+    try {
+      await MyLogDirectoryManage.init();
+      final config = logLevel != null
+          ? OmniLogConfig.forNetwork(
+              isolatePrefix: isolateName,
+            ).copyWith(level: logLevel)
+          : OmniLogConfig.forNetwork(isolatePrefix: isolateName);
+      _instance = OmniLogger(config);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup for production mode - minimal logging, optimized for performance
+  static Future<bool> setupProduction({String? isolatePrefix}) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(
+        OmniLogConfig.production(isolatePrefix: isolatePrefix),
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup for profile mode - moderate logging for performance analysis
+  static Future<bool> setupProfile({String? isolatePrefix}) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(
+        OmniLogConfig.profile(isolatePrefix: isolatePrefix),
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup for remote-only logging - logs are active but nothing saved locally
+  static Future<bool> setupRemoteOnly({String? isolatePrefix}) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(
+        OmniLogConfig.remoteOnly(isolatePrefix: isolatePrefix),
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Setup with specific LogMode for advanced control
+  static Future<bool> setupWithMode({
+    required OmniLogMode mode,
+    String? isolatePrefix,
+    OmniLogLevel? levelOverride,
+    bool? fileLoggingOverride,
+    bool? consoleLoggingOverride,
+  }) async {
+    try {
+      await MyLogDirectoryManage.init();
+      _instance = OmniLogger(
+        OmniLogConfig.custom(
+          mode: mode,
+          isolatePrefix: isolatePrefix,
+          levelOverride: levelOverride,
+          fileLoggingOverride: fileLoggingOverride,
+          consoleLoggingOverride: consoleLoggingOverride,
+        ),
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
   // ==================== LOGGER SETUP METHODS ====================
 
   /// Clean all logs across all isolates (if supported by underlying logger)
@@ -64,62 +303,6 @@ class OmniLoggerClient {
         debugPrint('AppLog: Failed to clean logs: $e');
         debugPrint('Stack trace: $st');
       }
-      return false;
-    }
-  }
-
-  /// DEVELOPMENT SETUP
-  static bool setupDevelopment({
-    bool cleanLogsFirst = true,
-    String? isolatePrefix,
-  }) {
-    try {
-      if (cleanLogsFirst) {
-        if (isSetup) {
-          cleanAllLogs();
-        }
-        reset();
-      }
-
-      _instance = OmniLogger(OmniLogConfig.debug(isolatePrefix: isolatePrefix));
-
-      final classLogger = OmniLoggerClient.log('AppLog');
-      classLogger.i('🚀 Development logger setup complete');
-      if (cleanLogsFirst) {
-        classLogger.i('🧹 Started with clean log files');
-      }
-
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// CONDITIONAL CLEAN SETUP
-  static bool setupWithConditionalClean({
-    bool cleanInDebugMode = true,
-    OmniLogger? myLogger,
-  }) {
-    try {
-      // Clean logs only in debug mode
-      if (kDebugMode && cleanInDebugMode && isSetup) {
-        cleanAllLogs();
-        reset();
-      }
-
-      // Setup the logger
-      _instance = myLogger ?? OmniLogger(OmniLogConfig.auto());
-
-      final classLogger = OmniLoggerClient.log('AppLog');
-      if (kDebugMode && cleanInDebugMode) {
-        classLogger.i('🧹 Debug mode: Started with clean logs');
-      }
-      classLogger.i('📊 Logger initialized successfully');
-
-      return true;
-    } catch (e) {
-      // Fallback to auto logger
-      _instance = OmniLogger(OmniLogConfig.auto());
       return false;
     }
   }
@@ -170,181 +353,6 @@ class OmniLoggerClient {
   }
 
   /// Quick setup to disable all logging in the **main isolate only**.
-  ///
-  /// ⚠️ NOTE: This only disables logging in the main isolate. Logs from other
-  /// isolates (e.g., database, background, network) will **still be active**
-  /// unless they are also configured to use an "off" configuration.
-  ///
-  /// ✅ To fully disable logging across your app:
-  /// - Use `MyLogConfig.off()` (or similar off-config logic) when setting up
-  ///   loggers in other isolates, network, background processes.
-  static bool setupOff({String? isolatePrefix}) {
-    try {
-      _instance = OmniLogger(OmniLogConfig.off(isolatePrefix: isolatePrefix));
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Quick setup for minimal logging (errors + crashes only)
-  static bool setupMinimal({String? isolatePrefix}) {
-    try {
-      _instance = OmniLogger(
-        OmniLogConfig.production(isolatePrefix: isolatePrefix),
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Quick setup for verbose logging (debug mode override)
-  static bool setupVerbose({String? isolatePrefix}) {
-    try {
-      _instance = OmniLogger(OmniLogConfig.debug(isolatePrefix: isolatePrefix));
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup with custom log level - for fine control
-  static bool setupCustomLevel({
-    required OmniLogLevel level,
-    String? isolatePrefix,
-    bool? enableFileLogging,
-    bool? enableConsoleLogging,
-  }) {
-    try {
-      _instance = OmniLogger(
-        OmniLogConfig.custom(
-          mode: OmniLogConfigManager.getCurrentMode(),
-          isolatePrefix: isolatePrefix,
-          levelOverride: level,
-          fileLoggingOverride: enableFileLogging,
-          consoleLoggingOverride: enableConsoleLogging,
-        ),
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup for database isolate
-  static bool setupForDatabaseIsolate({
-    String isolateName = 'db_isolate',
-    OmniLogLevel? logLevel,
-  }) {
-    try {
-      final config = logLevel != null
-          ? OmniLogConfig.forDatabase(
-              isolatePrefix: isolateName,
-            ).copyWith(level: logLevel)
-          : OmniLogConfig.forDatabase(isolatePrefix: isolateName);
-      _instance = OmniLogger(config);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup for background isolate
-  static bool setupForBackgroundIsolate({
-    String isolateName = 'bg_isolate',
-    OmniLogLevel? logLevel,
-  }) {
-    try {
-      final config = logLevel != null
-          ? OmniLogConfig.forBackground(
-              isolatePrefix: isolateName,
-            ).copyWith(level: logLevel)
-          : OmniLogConfig.forBackground(isolatePrefix: isolateName);
-      _instance = OmniLogger(config);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup for network isolate
-  static bool setupForNetworkIsolate({
-    String isolateName = 'network_isolate',
-    OmniLogLevel? logLevel,
-  }) {
-    try {
-      final config = logLevel != null
-          ? OmniLogConfig.forNetwork(
-              isolatePrefix: isolateName,
-            ).copyWith(level: logLevel)
-          : OmniLogConfig.forNetwork(isolatePrefix: isolateName);
-      _instance = OmniLogger(config);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup for production mode - minimal logging, optimized for performance
-  static bool setupProduction({String? isolatePrefix}) {
-    try {
-      _instance = OmniLogger(
-        OmniLogConfig.production(isolatePrefix: isolatePrefix),
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup for profile mode - moderate logging for performance analysis
-  static bool setupProfile({String? isolatePrefix}) {
-    try {
-      _instance = OmniLogger(
-        OmniLogConfig.profile(isolatePrefix: isolatePrefix),
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup for remote-only logging - logs are active but nothing saved locally
-  static bool setupRemoteOnly({String? isolatePrefix}) {
-    try {
-      _instance = OmniLogger(
-        OmniLogConfig.remoteOnly(isolatePrefix: isolatePrefix),
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Setup with specific LogMode for advanced control
-  static bool setupWithMode({
-    required OmniLogMode mode,
-    String? isolatePrefix,
-    OmniLogLevel? levelOverride,
-    bool? fileLoggingOverride,
-    bool? consoleLoggingOverride,
-  }) {
-    try {
-      _instance = OmniLogger(
-        OmniLogConfig.custom(
-          mode: mode,
-          isolatePrefix: isolatePrefix,
-          levelOverride: levelOverride,
-          fileLoggingOverride: fileLoggingOverride,
-          consoleLoggingOverride: consoleLoggingOverride,
-        ),
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
 
   /// Get comprehensive system status
   static Map<String, dynamic> getSystemStatus() {

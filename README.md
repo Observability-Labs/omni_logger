@@ -12,7 +12,7 @@
 
 ```yaml
 dependencies:
-  omni_logger: ^1.0.0
+  omni_logger: ^2.0.0
 ```
 
 ### 2. Setup & Use
@@ -22,7 +22,11 @@ import 'package:omni_logger/omni_logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  AppLog.setup();
+  try {
+    await AppLog.setup();
+  } catch (e) {
+    debugPrint('AppLog setup failed: $e');
+  }
   runApp(const MyApp());
 }
 
@@ -36,30 +40,25 @@ AppLog.log('Database').d('Query executed');
 
 ## Table of Contents
 
-- [Why Omni Logger?](#-why-omni-logger)
+- [Features](#-features)
 - [Smart Auto-Configuration](#-smart-auto-configuration)
 - [Logging Levels](#-logging-levels)
 - [Isolate Support](#-isolate-support)
-- [Advanced Features](#-advanced-features)
 - [Platform Support](#-platform-support)
 
 ---
 
-## 🎯 Why Omni Logger?
+## ✨ Features
 
-Most Flutter apps start with `print()` or `debugPrint()`, then face these challenges:
-
-- 📱 **No persistence** — Debug info disappears when the app closes
-- 🔍 **Poor production visibility** — Can't diagnose user-reported issues
-- ⚡ **Performance impact** — Verbose logging slowing down production builds
-- 🔧 **Manual setup** — File rotation, compression, cleanup all manual
-
-| Challenge | Omni Logger | Traditional |
-|-----------|-------------|-------------|
-| **Setup** | ✅ `AppLog.setup()` — zero config | ❌ Manual configuration |
-| **File Management** | ✅ Auto rotation, compression, cleanup | ❌ Manual FileOutput setup |
-| **Build Optimization** | ✅ Auto-adapts to debug/release modes | ❌ Same config for all builds |
-| **Production Debugging** | ✅ Persistent logs | ❌ No production logging |
+| Feature | Detail |
+|---------|--------|
+| **Zero-config setup** | `AppLog.setup()` — auto-detects debug/profile/release |
+| **File management** | Auto rotation, compression, and cleanup |
+| **Build optimization** | Different log levels and retention per build mode |
+| **Persistent logs** | Survives app restarts for production debugging |
+| **Isolate-aware** | Specialized setup for database and background isolates |
+| **Cross-platform paths** | `path_provider` for reliable, persistent storage on all platforms |
+| **Safe fallbacks** | Three-layer fallback ensures logging never crashes your app |
 
 ---
 
@@ -92,37 +91,20 @@ AppLog.log('ClassName').f('Fatal message');   // 💀 Fatal
 
 ```dart
 // Database isolate (Drift, etc.)
-AppLog.setupForDatabaseIsolate(isolateName: 'drift_db');
+try {
+  await AppLog.setupForDatabaseIsolate(isolateName: 'drift_db');
+} catch (e) {
+  debugPrint('AppLog database isolate setup failed: $e');
+}
 AppLog.log('Database').d('Query executed successfully');
 
 // Background isolate
-AppLog.setupForBackgroundIsolate(isolateName: 'sync_worker');
+try {
+  await AppLog.setupForBackgroundIsolate(isolateName: 'sync_worker');
+} catch (e) {
+  debugPrint('AppLog background isolate setup failed: $e');
+}
 AppLog.log('SyncService').w('Sync took longer than expected');
-```
-
----
-
-## 🔧 Advanced Features
-
-### Setup Options
-
-```dart
-AppLog.setup();            // Auto-detect environment
-AppLog.setupDevelopment(); // Debug mode with clean logs
-AppLog.setupProduction();  // Minimal logging
-AppLog.setupOff();         // Disable all logging
-```
-
-### Runtime Control
-
-```dart
-AppLog.cleanAllLogs();     // Clean all log files
-AppLog.printLogStats();    // Print log statistics
-AppLog.checkHealth();      // Get health status
-AppLog.reset();            // Reset logger
-AppLog.isSetup;            // Check if initialized
-AppLog.currentLevel;       // Get current log level
-AppLog.isLoggingDisabled;  // Check if logging is off
 ```
 
 ---

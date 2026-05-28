@@ -9,7 +9,11 @@ Future<void> main() async {
     print('Setup OmniLogger ...');
   }
 
-  AppLog.setup();
+  try {
+    await AppLog.setup();
+  } catch (e) {
+    debugPrint('Outer AppLog setup emergency fallback: $e');
+  }
 
   runApp(const MyApp());
 }

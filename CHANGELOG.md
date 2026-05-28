@@ -1,3 +1,16 @@
+## [2.0.0] - 2026-05-28
+
+### Changed
+- Replaced fragile environment variable path lookups with `path_provider` for cross-platform reliability
+- `AppLog.setup()` and `OmniLoggerClient.setup()` are now asynchronous and must be awaited in `main.dart`
+
+### Fixed
+- Mobile startup path crashes resolved by using `getApplicationSupportDirectory()`
+- Wrapped directory resolution in fail-safe try/catch blocks with `systemTemp` fallback for all non-web platforms
+
+### Breaking Change
+- `AppLog.setup()` and `OmniLoggerClient.setup()` must now be awaited
+
 ## [1.0.5] - 2026-05-11
 
 ### Fixed

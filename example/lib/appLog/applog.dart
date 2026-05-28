@@ -10,20 +10,20 @@ class AppLog {
   // ==================== BASIC SETUP METHODS ====================
 
   /// Simple setup - auto-detects environment and configures appropriately
-  static bool setup({String? isolatePrefix}) => OmniLoggerClient.setup(
+  static Future<bool> setup({String? isolatePrefix}) => OmniLoggerClient.setup(
     omniLogger: OmniLogger(OmniLogConfig.auto(isolatePrefix: isolatePrefix)),
   );
 
   /// Development setup with clean logs
-  static bool setupDevelopment({String? isolatePrefix}) =>
+  static Future<bool> setupDevelopment({String? isolatePrefix}) =>
       OmniLoggerClient.setupDevelopment(isolatePrefix: isolatePrefix);
 
   /// Production setup - minimal logging
-  static bool setupProduction({String? isolatePrefix}) =>
+  static Future<bool> setupProduction({String? isolatePrefix}) =>
       OmniLoggerClient.setupProduction(isolatePrefix: isolatePrefix);
 
   /// Turn off all logging
-  static bool setupOff({String? isolatePrefix}) =>
+  static Future<bool> setupOff({String? isolatePrefix}) =>
       OmniLoggerClient.setupOff(isolatePrefix: isolatePrefix);
 
   // ==================== BASIC UTILITIES ====================
@@ -54,7 +54,7 @@ class AppLog {
 
   // ==================== SPECIALIZED SETUP METHODS ====================
   /// Setup for database isolate
-  static bool setupForDatabaseIsolate({
+  static Future<bool> setupForDatabaseIsolate({
     String isolateName = 'db_isolate',
     OmniLogLevel? logLevel,
   }) => OmniLoggerClient.setupForDatabaseIsolate(
@@ -63,7 +63,7 @@ class AppLog {
   );
 
   /// Setup for background isolate
-  static bool setupForBackgroundIsolate({
+  static Future<bool> setupForBackgroundIsolate({
     String isolateName = 'bg_isolate',
     OmniLogLevel? logLevel,
   }) => OmniLoggerClient.setupForBackgroundIsolate(
